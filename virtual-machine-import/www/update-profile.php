@@ -97,7 +97,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         <h2>Update Profile</h2>
         <form action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>" method="post">
             <div class="form-group">
-                <label>Name</label>
+                <label>Full Name including first name, middle name, last name, suffix, etc.</label>
                 <input type="text" name="name" class="form-control" value="<?php echo htmlspecialchars($userData['name'] ?? ''); ?>">
             </div>
             <div class="form-group">
