@@ -119,7 +119,7 @@ mysqli_close($link);
             ?>
         </table>
         <!-- Buttons for Welcome Page and Signing Out -->
-        <a href="welcome.php" class="btn btn-info btn-custom">Back to Home Page</a>
+        <a href="welcome.php" class="btn btn-info btn-custom">Home Page</a>
         <a href="logout.php" class="btn btn-danger btn-custom">Sign Out</a>
     </div>    
 </body>

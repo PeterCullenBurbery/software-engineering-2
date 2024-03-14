@@ -138,6 +138,11 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
                 <input type="submit" class="btn btn-primary" value="Book Appointment">
             </div>
         </form>
+		        <!-- Navigation Buttons -->
+        <div class="navigation-btns">
+            <a href="welcome.php" class="btn btn-info">Home Page</a>
+            <a href="logout.php" class="btn btn-danger">Sign Out</a>
+        </div>
     </div>    
 </body>
 </html>

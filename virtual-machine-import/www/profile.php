@@ -3,7 +3,7 @@
 session_start();
 
 // Check if the user is logged in, otherwise redirect to login page
-if(!isset($_SESSION["loggedin"]) || $_SESSION["loggedin"] !== true){
+if (!isset($_SESSION["loggedin"]) || $_SESSION["loggedin"] !== true) {
     header("location: login.php");
     exit;
 }
@@ -11,25 +11,16 @@ if(!isset($_SESSION["loggedin"]) || $_SESSION["loggedin"] !== true){
 // Include config file
 require_once "config.php";
 
-$user_name = ""; // Initialize the name as empty
+// Attempt to fetch user information
 $user_id = $_SESSION["id"];
+$sql = "SELECT name, firstName, middleName, lastName, localaddress, city, stateprovince, zippostalcode, fulladdress, emailaddress, phonenumber, DATE_FORMAT(birthdate, '%Y-%m-%d') as birthdate, gender FROM users WHERE id = ?";
+$stmt = mysqli_prepare($link, $sql);
+mysqli_stmt_bind_param($stmt, "i", $user_id);
+mysqli_stmt_execute($stmt);
+$result = mysqli_stmt_get_result($stmt);
+$user = mysqli_fetch_assoc($result);
 
-$sql = "SELECT name FROM users WHERE id = ?";
-
-if($stmt = mysqli_prepare($link, $sql)){
-    mysqli_stmt_bind_param($stmt, "i", $param_id);
-    $param_id = $user_id;
-    if(mysqli_stmt_execute($stmt)){
-        mysqli_stmt_store_result($stmt);
-        if(mysqli_stmt_num_rows($stmt) == 1){
-            mysqli_stmt_bind_result($stmt, $user_name);
-            mysqli_stmt_fetch($stmt);
-        }
-    } else{
-        echo "Oops! Something went wrong. Please try again later.";
-    }
-    mysqli_stmt_close($stmt);
-}
+mysqli_stmt_close($stmt);
 mysqli_close($link);
 ?>
 
@@ -41,25 +32,61 @@ mysqli_close($link);
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
     <style>
         body{ font: 14px sans-serif; }
-        .wrapper{ width: 360px; padding: 20px; }
-        .btn-custom { margin-bottom: 10px; } /* Custom class for spacing */
+        .wrapper{ width: 600px; padding: 20px; margin: auto; }
+        .form-group { margin-bottom: 10px; }
+        .btn-custom { margin-top: 20px; }
     </style>
 </head>
 <body>
     <div class="wrapper">
-        <h2>Your Profile</h2>
-        <?php if (!empty($user_name)): ?>
-            <p>Welcome, <?php echo htmlspecialchars($user_name); ?>!</p>
-        <?php else: ?>
-            <p>Welcome, User! Your name is not set.</p>
-            <a href="update-name.php" class="btn btn-warning btn-custom">Update Name</a>
-        <?php endif; ?>
-        <!-- Button to go to the welcome page -->
-        <a href="welcome.php" class="btn btn-primary btn-custom">Go to Home Page</a>
-        <!-- Button to log out -->
+        <h2>Profile</h2>
+        <div class="form-group">
+            <label><b>Full Name:</b> <?php echo htmlspecialchars($user['name']); ?></label>
+        </div>
+        <div class="form-group">
+            <label><b>First Name:</b> <?php echo htmlspecialchars($user['firstName']); ?></label>
+        </div>
+        <div class="form-group">
+            <label><b>Middle Name:</b> <?php echo htmlspecialchars($user['middleName']); ?></label>
+        </div>
+        <div class="form-group">
+            <label><b>Last Name:</b> <?php echo htmlspecialchars($user['lastName']); ?></label>
+        </div>
+        <div class="form-group">
+            <label><b>Local Address:</b> <?php echo htmlspecialchars($user['localaddress']); ?></label>
+        </div>
+        <div class="form-group">
+            <label><b>City:</b> <?php echo htmlspecialchars($user['city']); ?></label>
+        </div>
+        <div class="form-group">
+            <label><b>State/Province:</b> <?php echo htmlspecialchars($user['stateprovince']); ?></label>
+        </div>
+        <div class="form-group">
+            <label><b>Zip/Postal Code:</b> <?php echo htmlspecialchars($user['zippostalcode']); ?></label>
+        </div>
+        <div class="form-group">
+            <label><b>Full Address:</b> <?php echo htmlspecialchars($user['fulladdress']); ?></label>
+        </div>
+        <div class="form-group">
+            <label><b>Email Address:</b> <?php echo htmlspecialchars($user['emailaddress']); ?></label>
+        </div>
+        <div class="form-group">
+            <label><b>Phone Number:</b> <?php echo htmlspecialchars($user['phonenumber']); ?></label>
+        </div>
+        <div class="form-group">
+            <label><b>Birthdate:</b> <?php echo htmlspecialchars($user['birthdate']); ?></label>
+        </div>
+        <div class="form-group">
+            <label><b>Gender:</b> <?php echo htmlspecialchars($user['gender']); ?></label>
+        </div>
+        <!-- Update Profile button -->
+        <a href="update-profile.php" class="btn btn-primary btn-custom">Update Profile</a>
+
+        <!-- Home Page button -->
+        <a href="welcome.php" class="btn btn-info btn-custom">Home Page</a>
+
+        <!-- Sign Out button -->
         <a href="logout.php" class="btn btn-danger btn-custom">Sign Out</a>
-        <p>Here is your profile information.</p>
-        <!-- Display more profile information here -->
     </div>    
 </body>
 </html>

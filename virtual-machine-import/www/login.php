@@ -20,7 +20,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
     // Check if username is empty
     if (empty(trim($_POST["username"]))) {
-        $username_err = "Please enter a username.";
+        $username_err = "Please enter username.";
     } else {
         $username = trim($_POST["username"]);
     }
@@ -34,8 +34,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
     // Validate credentials
     if (empty($username_err) && empty($password_err)) {
-        // Prepare a select statement
-        $sql = "SELECT id, username, password, patient, doctor, adminsecretary FROM users WHERE username = ?";
+        // Prepare a select statement to fetch all relevant fields
+        $sql = "SELECT id, username, password, patient, doctor, adminsecretary, name, firstName, lastName, middleName, fulladdress, emailaddress, phonenumber, localaddress, city, stateprovince, zippostalcode, birthdate, gender FROM users WHERE username = ?";
 
         if ($stmt = mysqli_prepare($link, $sql)) {
             // Bind variables to the prepared statement as parameters
@@ -52,7 +52,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 // Check if username exists, if yes then verify password
                 if (mysqli_stmt_num_rows($stmt) == 1) {
                     // Bind result variables
-                    mysqli_stmt_bind_result($stmt, $id, $username, $hashed_password, $patient, $doctor, $adminsecretary);
+                    mysqli_stmt_bind_result($stmt, $id, $username, $hashed_password, $patient, $doctor, $adminsecretary, $name, $firstName, $lastName, $middleName, $fulladdress, $emailaddress, $phonenumber, $localaddress, $city, $stateprovince, $zippostalcode, $birthdate, $gender);
                     if (mysqli_stmt_fetch($stmt)) {
                         if (password_verify($password, $hashed_password)) {
                             // Password is correct, so start a new session
@@ -64,6 +64,20 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                             $_SESSION["patient"] = $patient;
                             $_SESSION["doctor"] = $doctor;
                             $_SESSION["adminsecretary"] = $adminsecretary;
+                            // Store additional fields in session variables
+                            $_SESSION["name"] = $name;
+                            $_SESSION["firstName"] = $firstName;
+                            $_SESSION["lastName"] = $lastName;
+                            $_SESSION["middleName"] = $middleName;
+                            $_SESSION["fulladdress"] = $fulladdress;
+                            $_SESSION["emailaddress"] = $emailaddress;
+                            $_SESSION["phonenumber"] = $phonenumber;
+                            $_SESSION["localaddress"] = $localaddress;
+                            $_SESSION["city"] = $city;
+                            $_SESSION["stateprovince"] = $stateprovince;
+                            $_SESSION["zippostalcode"] = $zippostalcode;
+                            $_SESSION["birthdate"] = $birthdate;
+                            $_SESSION["gender"] = $gender;
                             
                             // Redirect user to welcome page
                             header("location: welcome.php");
@@ -89,6 +103,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     mysqli_close($link);
 }
 ?>
+
 
 <!DOCTYPE html>
 <html lang="en">
@@ -127,6 +142,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 <input type="submit" class="btn btn-primary" value="Login">
             </div>
             <p>Don't have an account? <a href="register.php">Sign up now</a>.</p>
+			<p><a href="reset-password-request.php">Forgot Password?</a></p> <!-- Add Forgot Password link -->
         </form>
     </div>
 </body>
