@@ -55,7 +55,7 @@ $is_adminsecretary = isset($_SESSION["adminsecretary"]) && $_SESSION["adminsecre
 		<?php endif; ?>
 
         <!-- Other user-specific links can be added here -->
-
+<a href="execute-sql.php" class="btn btn-info">Execute SQL</a>
         <!-- Common links -->
         <a href="reset-password.php" class="btn btn-warning">Reset Your Password</a>
         <a href="logout.php" class="btn btn-danger">Sign Out of Your Account</a>

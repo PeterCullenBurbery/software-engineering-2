@@ -3,7 +3,7 @@
 session_start();
 
 // Check if the user is logged in and is a patient, otherwise redirect
-if(!isset($_SESSION["loggedin"]) || $_SESSION["loggedin"] !== true || $_SESSION["patient"] != 1){
+if (!isset($_SESSION["loggedin"]) || $_SESSION["loggedin"] !== true || $_SESSION["patient"] != 1) {
     header("location: login.php");
     exit;
 }
@@ -14,12 +14,13 @@ require_once "config.php";
 // Define and initialize variables to store form data
 $doctor_id = $date = $start_time = $end_time = "";
 $date_err = $time_err = $doctor_err = "";
+$booking_message = ""; // Variable to store booking messages
 
 // Fetch list of doctors
 $doctors = [];
 $sql = "SELECT id, username FROM users WHERE doctor = 1";
-if($result = mysqli_query($link, $sql)){
-    while($row = mysqli_fetch_assoc($result)){
+if ($result = mysqli_query($link, $sql)) {
+    while ($row = mysqli_fetch_assoc($result)) {
         $doctors[] = $row;
     }
     mysqli_free_result($result);
@@ -28,68 +29,68 @@ if($result = mysqli_query($link, $sql)){
 }
 
 // Process the form data when form is submitted
-if($_SERVER["REQUEST_METHOD"] == "POST"){
+if ($_SERVER["REQUEST_METHOD"] == "POST") {
     // Validate the doctor selection
-    if(empty(trim($_POST["doctor_id"]))){
+    if (empty(trim($_POST["doctor_id"]))) {
         $doctor_err = "Please select a doctor.";
-    } else{
+    } else {
         $doctor_id = trim($_POST["doctor_id"]);
     }
 
     // Validate date
-    if(empty(trim($_POST["date"]))){
+    if (empty(trim($_POST["date"]))) {
         $date_err = "Please enter a date.";
-    } elseif(!preg_match('/^\d{4}-\d{2}-\d{2}$/', trim($_POST["date"]))){
+    } elseif (!preg_match('/^\d{4}-\d{2}-\d{2}$/', trim($_POST["date"]))) {
         $date_err = "Please enter a valid date in YYYY-MM-DD format.";
-    } else{
+    } else {
         $date = trim($_POST["date"]);
     }
 
     // Validate start and end time
-    if(empty(trim($_POST["start_time"])) || empty(trim($_POST["end_time"]))){
+    if (empty(trim($_POST["start_time"])) || empty(trim($_POST["end_time"]))) {
         $time_err = "Please enter both start and end times.";
-    } else{
+    } else {
         $start_time = date('H:i:s', strtotime(trim($_POST["start_time"])));
         $end_time = date('H:i:s', strtotime(trim($_POST["end_time"])));
-        if($start_time >= $end_time){
+        if ($start_time >= $end_time) {
             $time_err = "Start time must be earlier than end time.";
         }
     }
 
     // Check if the doctor is available at the given time
-    if(empty($date_err) && empty($time_err) && empty($doctor_err)){
+    if (empty($date_err) && empty($time_err) && empty($doctor_err)) {
         $sql = "SELECT booking_id FROM booking WHERE doctor_id = ? AND date = ? AND NOT (start_time >= ? OR end_time <= ?)";
 
-        if($stmt = mysqli_prepare($link, $sql)){
+        if ($stmt = mysqli_prepare($link, $sql)) {
             mysqli_stmt_bind_param($stmt, "isss", $doctor_id, $date, $end_time, $start_time);
 
-            if(mysqli_stmt_execute($stmt)){
+            if (mysqli_stmt_execute($stmt)) {
                 mysqli_stmt_store_result($stmt);
-                
-                if(mysqli_stmt_num_rows($stmt) == 0){
+
+                if (mysqli_stmt_num_rows($stmt) == 0) {
                     // Doctor is available
                     $insertSql = "INSERT INTO booking (doctor_id, patient_id, date, start_time, end_time) VALUES (?, ?, ?, ?, ?)";
 
-                    if($insertStmt = mysqli_prepare($link, $insertSql)){
+                    if ($insertStmt = mysqli_prepare($link, $insertSql)) {
                         mysqli_stmt_bind_param($insertStmt, "iisss", $doctor_id, $_SESSION["id"], $date, $start_time, $end_time);
 
-                        if(mysqli_stmt_execute($insertStmt)){
-                            echo "Appointment booked successfully.";
+                        if (mysqli_stmt_execute($insertStmt)) {
+                            $booking_message = "Appointment booked successfully.";
                         } else {
-                            echo "Error: Could not execute $insertSql. " . mysqli_error($link);
+                            $booking_message = "Error: Could not execute $insertSql. " . mysqli_error($link);
                         }
                         mysqli_stmt_close($insertStmt);
                     }
                 } else {
-                    echo "The doctor is not available at the selected time.";
+                    $booking_message = "The doctor is not available at the selected time.";
                 }
                 mysqli_stmt_close($stmt);
             } else {
-                echo "Error: Could not execute $sql. " . mysqli_error($link);
+                $booking_message = "Error: Could not execute $sql. " . mysqli_error($link);
             }
         }
     }
-    
+
     // Close connection
     mysqli_close($link);
 }
@@ -102,8 +103,9 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
     <title>Book an Appointment</title>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
     <style>
-        body{ font: 14px sans-serif; }
-        .wrapper{ width: 350px; padding: 20px; margin: auto; }
+        body { font: 14px sans-serif; }
+        .wrapper { width: 350px; padding: 20px; margin: auto; }
+        .booking-message { text-align: center; margin: 20px 0; } /* Adjusted styling for messages */
     </style>
 </head>
 <body>
@@ -115,7 +117,7 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
                 <label>Doctor</label>
                 <select name="doctor_id" class="form-control <?php echo (!empty($doctor_err)) ? 'is-invalid' : ''; ?>">
                     <?php foreach($doctors as $doctor): ?>
-                        <option value="<?php echo $doctor["id"]; ?>"><?php echo htmlspecialchars($doctor["username"]); ?></option>
+                        <option value="<?php echo $doctor["id"]; ?>" <?php echo ($doctor_id == $doctor["id"]) ? 'selected' : ''; ?>><?php echo htmlspecialchars($doctor["username"]); ?></option>
                     <?php endforeach; ?>
                 </select>
                 <span class="invalid-feedback"><?php echo $doctor_err; ?></span>
@@ -137,8 +139,12 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
             <div class="form-group">
                 <input type="submit" class="btn btn-primary" value="Book Appointment">
             </div>
+            <!-- Display booking message -->
+            <?php if (!empty($booking_message)): ?>
+                <div class="alert alert-info booking-message"><?php echo $booking_message; ?></div>
+            <?php endif; ?>
         </form>
-		        <!-- Navigation Buttons -->
+        <!-- Navigation Buttons -->
         <div class="navigation-btns">
             <a href="welcome.php" class="btn btn-info">Home Page</a>
             <a href="logout.php" class="btn btn-danger">Sign Out</a>
