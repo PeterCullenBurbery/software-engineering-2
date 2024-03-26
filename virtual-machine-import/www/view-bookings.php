@@ -4,7 +4,7 @@ session_start();
 
 // Check if the user is logged in, if not then redirect to the login page
 if (!isset($_SESSION["loggedin"]) || $_SESSION["loggedin"] !== true) {
-    header("location: login.php");
+    header("location: sign-in.php");
     exit;
 }
 
@@ -119,8 +119,8 @@ mysqli_close($link);
             ?>
         </table>
         <!-- Buttons for Welcome Page and Signing Out -->
-        <a href="welcome.php" class="btn btn-info btn-custom">Home Page</a>
-        <a href="logout.php" class="btn btn-danger btn-custom">Sign Out</a>
+        <a href="home-page.php" class="btn btn-info btn-custom">Home Page</a>
+        <a href="sign-out.php" class="btn btn-danger btn-custom">Sign Out</a>
     </div>    
 </body>
 </html>

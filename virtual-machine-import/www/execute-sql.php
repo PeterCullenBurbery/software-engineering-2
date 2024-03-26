@@ -5,7 +5,7 @@ require_once "config.php";
 
 // Verify user's permission
 if (!isset($_SESSION["loggedin"]) || $_SESSION["loggedin"] !== true) {
-    header("location: login.php");
+    header("location: sign-in.php");
     exit;
 }
 

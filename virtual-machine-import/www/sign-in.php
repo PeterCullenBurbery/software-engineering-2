@@ -4,7 +4,7 @@ session_start();
 
 // Check if the user is already logged in, if yes then redirect him to the welcome page
 if (isset($_SESSION["loggedin"]) && $_SESSION["loggedin"] === true) {
-    header("location: welcome.php");
+    header("location: home-page.php");
     exit;
 }
 
@@ -13,7 +13,7 @@ require_once "config.php";
 
 // Define variables and initialize with empty values
 $username = $password = "";
-$username_err = $password_err = $login_err = "";
+$username_err = $password_err = $sign_in_error = "";
 
 // Processing form data when form is submitted
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
@@ -80,15 +80,15 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                             $_SESSION["gender"] = $gender;
                             
                             // Redirect user to welcome page
-                            header("location: welcome.php");
+                            header("location: home-page.php");
                         } else {
                             // Password is not valid, display a generic error message
-                            $login_err = "Invalid username or password.";
+                            $sign_in_error = "Invalid username or password.";
                         }
                     }
                 } else {
                     // Username doesn't exist, display a generic error message
-                    $login_err = "Invalid username or password.";
+                    $sign_in_error = "Invalid username or password.";
                 }
             } else {
                 echo "Oops! Something went wrong. Please try again later.";
@@ -109,7 +109,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Login</title>
+    <title>Sign in</title>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
     <style>
         body { font: 14px sans-serif; }
@@ -122,8 +122,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         <p>Please fill in your credentials to sign in.</p>
         
         <?php 
-        if (!empty($login_err)) {
-            echo '<div class="alert alert-danger">' . $login_err . '</div>';
+        if (!empty($sign_in_error)) {
+            echo '<div class="alert alert-danger">' . $sign_in_error . '</div>';
         }        
         ?>
 
@@ -139,9 +139,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 <span class="invalid-feedback"><?php echo $password_err; ?></span>
             </div>
             <div class="form-group">
-                <input type="submit" class="btn btn-primary" value="Login">
+                <input type="submit" class="btn btn-primary" value="Sign in">
             </div>
-            <p>Don't have an account? <a href="register.php">Sign up now</a>.</p>
+            <p>Don't have an account? <a href="sign-up.php">Sign up now</a>.</p>
 			<p><a href="reset-password-request.php">Forgot Password?</a></p> <!-- Add Forgot Password link -->
         </form>
     </div>

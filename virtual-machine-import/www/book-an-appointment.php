@@ -4,7 +4,7 @@ session_start();
 
 // Check if the user is logged in and is a patient, otherwise redirect
 if (!isset($_SESSION["loggedin"]) || $_SESSION["loggedin"] !== true || $_SESSION["patient"] != 1) {
-    header("location: login.php");
+    header("location: sign-in.php");
     exit;
 }
 
@@ -146,8 +146,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         </form>
         <!-- Navigation Buttons -->
         <div class="navigation-btns">
-            <a href="welcome.php" class="btn btn-info">Home Page</a>
-            <a href="logout.php" class="btn btn-danger">Sign Out</a>
+            <a href="home-page.php" class="btn btn-info">Home Page</a>
+            <a href="sign-out.php" class="btn btn-danger">Sign Out</a>
         </div>
     </div>    
 </body>

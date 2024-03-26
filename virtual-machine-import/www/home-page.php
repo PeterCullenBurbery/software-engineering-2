@@ -12,7 +12,7 @@ session_start();
 
 // Check if the user is already logged in, if not then redirect to the login page
 if (!isset($_SESSION["loggedin"]) || $_SESSION["loggedin"] !== true) {
-    header("location: login.php");
+    header("location: sign-in.php");
     exit;
 }
 
@@ -58,7 +58,7 @@ $is_adminsecretary = isset($_SESSION["adminsecretary"]) && $_SESSION["adminsecre
 <a href="execute-sql.php" class="btn btn-info">Execute SQL</a>
         <!-- Common links -->
         <a href="reset-password.php" class="btn btn-warning">Reset Your Password</a>
-        <a href="logout.php" class="btn btn-danger">Sign Out of Your Account</a>
+        <a href="sign-out.php" class="btn btn-danger">Sign Out of Your Account</a>
     </p>
 </body>
 </html>
